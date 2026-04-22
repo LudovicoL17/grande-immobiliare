@@ -48,7 +48,7 @@ nav{position:fixed;top:1.2rem;left:50%;transform:translateX(-50%);z-index:100;
 .hero{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;
   padding:2rem;padding-top:80px;overflow:hidden}
 .hero-photo{position:absolute;inset:0;border-radius:0;
-  background:url('https://images.unsplash.com/photo-1600607687939-ce8a6d3e6a78?w=1800&q=90&auto=format&fit=crop') center/cover no-repeat}
+  background:url('https://images.unsplash.com/photo-1560449752-3fd24d87f47a?w=1800&q=90&auto=format&fit=crop') center/cover no-repeat}
 .hero-overlay{position:absolute;inset:0;
   background:linear-gradient(to bottom,rgba(9,9,11,.25) 0%,rgba(9,9,11,.5) 50%,rgba(9,9,11,.92) 100%)}
 /* Giant watermark */
@@ -206,6 +206,62 @@ footer{background:var(--bg2);padding:3rem 2rem 1.5rem;border-top:1px solid var(-
 .footer-bottom{max-width:1200px;margin:2rem auto 0;padding-top:1.2rem;
   border-top:1px solid var(--border);display:flex;justify-content:space-between;
   align-items:center;flex-wrap:wrap;gap:.8rem;font-size:.72rem;color:var(--dim)}
+
+/* MAP WIDGET */
+.map-widget{position:relative;display:inline-block;margin-top:2rem;cursor:pointer;user-select:none}
+.map-inner{
+  position:relative;overflow:hidden;border-radius:16px;
+  background:var(--card);border:1px solid var(--border);
+  width:240px;height:140px;
+  transition:width .45s cubic-bezier(.34,1.26,.64,1),height .45s cubic-bezier(.34,1.26,.64,1),border-color .25s;
+  will-change:transform;
+}
+.map-widget:hover .map-inner{border-color:var(--border2)}
+.map-inner.expanded{width:340px;height:260px}
+/* 3D tilt via JS CSS vars */
+.map-inner{transform:perspective(800px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:width .45s cubic-bezier(.34,1.26,.64,1),height .45s cubic-bezier(.34,1.26,.64,1),transform .15s ease,border-color .25s}
+/* Map BG */
+.map-bg{position:absolute;inset:0;background:var(--bg3);opacity:0;transition:opacity .35s .1s;pointer-events:none}
+.map-inner.expanded .map-bg{opacity:1}
+.map-svg{position:absolute;inset:0;width:100%;height:100%}
+.map-road{stroke:rgba(255,255,255,.18);fill:none;stroke-dasharray:1000;stroke-dashoffset:1000;transition:stroke-dashoffset .7s ease}
+.map-road-sec{stroke:rgba(255,255,255,.07);fill:none;stroke-dasharray:1000;stroke-dashoffset:1000;transition:stroke-dashoffset .5s ease}
+.map-inner.expanded .map-road{stroke-dashoffset:0}
+.map-inner.expanded .map-road-sec{stroke-dashoffset:0}
+.map-road:nth-child(2){transition-delay:.1s}.map-road:nth-child(3){transition-delay:.2s}.map-road:nth-child(4){transition-delay:.15s}.map-road:nth-child(5){transition-delay:.25s}
+.map-road-sec:nth-child(6){transition-delay:.3s}.map-road-sec:nth-child(7){transition-delay:.35s}.map-road-sec:nth-child(8){transition-delay:.38s}.map-road-sec:nth-child(9){transition-delay:.42s}.map-road-sec:nth-child(10){transition-delay:.46s}
+/* Buildings */
+.map-bld{position:absolute;border-radius:2px;background:rgba(200,169,110,.18);border:1px solid rgba(200,169,110,.12);opacity:0;transform:scale(.8);transition:opacity .3s,transform .3s}
+.map-inner.expanded .map-bld{opacity:1;transform:scale(1)}
+.map-bld:nth-child(1){transition-delay:.45s}.map-bld:nth-child(2){transition-delay:.52s}.map-bld:nth-child(3){transition-delay:.58s}.map-bld:nth-child(4){transition-delay:.63s}.map-bld:nth-child(5){transition-delay:.68s}.map-bld:nth-child(6){transition-delay:.55s}
+/* Pin */
+.map-pin{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);opacity:0;transition:transform .4s cubic-bezier(.34,1.56,.64,1) .3s,opacity .3s .3s;filter:drop-shadow(0 0 8px rgba(52,211,153,.55))}
+.map-inner.expanded .map-pin{transform:translate(-50%,-50%) scale(1);opacity:1}
+/* Fade gradient bottom of map */
+.map-fade{position:absolute;bottom:0;left:0;right:0;height:40%;background:linear-gradient(to top,var(--card),transparent);pointer-events:none;opacity:0;transition:opacity .35s .1s}
+.map-inner.expanded .map-fade{opacity:1}
+/* Grid pattern (collapsed) */
+.map-grid-pat{position:absolute;inset:0;opacity:.03;transition:opacity .3s}
+.map-inner.expanded .map-grid-pat{opacity:0}
+/* Content overlay */
+.map-content{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:1rem}
+.map-topbar{display:flex;align-items:center;justify-content:space-between}
+.map-icon-w{opacity:1;transition:opacity .3s}
+.map-inner.expanded .map-icon-w{opacity:0}
+.map-live{display:flex;align-items:center;gap:.35rem;background:rgba(255,255,255,.06);border-radius:999px;padding:.2rem .55rem}
+.map-live-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;box-shadow:0 0 6px #4ade80}
+.map-live span{font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.map-bottom{display:flex;flex-direction:column;gap:.25rem}
+.map-bottom h4{font-size:.82rem;font-weight:600;color:var(--text);transition:transform .3s;letter-spacing:-.01em}
+.map-widget:hover .map-bottom h4{transform:translateX(3px)}
+.map-coords{font-size:.68rem;font-family:'Courier New',monospace;color:var(--muted);height:0;overflow:hidden;opacity:0;transition:height .25s,opacity .25s}
+.map-inner.expanded .map-coords{height:1.2em;opacity:1;transition-delay:.15s}
+.map-underline{height:1px;background:linear-gradient(to right,rgba(200,169,110,.5),transparent);width:30%;transition:width .4s ease}
+.map-widget:hover .map-underline,.map-inner.expanded .map-underline{width:100%}
+/* Click hint */
+.map-hint{position:absolute;bottom:-1.4rem;left:50%;transform:translateX(-50%);font-size:.62rem;color:var(--dim);white-space:nowrap;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none}
+.map-widget:hover .map-hint{opacity:1;transform:translateX(-50%) translateY(-2px)}
+.map-inner.expanded~.map-hint{opacity:0!important}
 
 /* FADE */
 .fu{opacity:0;transform:translateY(20px);transition:opacity .55s ease,transform .55s ease}
@@ -466,6 +522,63 @@ footer{background:var(--bg2);padding:3rem 2rem 1.5rem;border-top:1px solid var(-
           <div class="perk"><span class="perk-dot"></span><span>Disponibili anche il sabato mattina</span></div>
           <div class="perk"><span class="perk-dot"></span><span>Un agente dedicato per tutta la trattativa</span></div>
         </div>
+
+        <!-- Interactive map widget -->
+        <div class="map-widget" id="mapW" role="button" aria-label="Espandi mappa sede">
+          <div class="map-inner" id="mapI">
+            <!-- BG map layer -->
+            <div class="map-bg"></div>
+            <!-- SVG streets -->
+            <svg class="map-svg" viewBox="0 0 340 260" preserveAspectRatio="none" aria-hidden="true">
+              <line class="map-road" x1="0" y1="91" x2="340" y2="91" stroke-width="4"/>
+              <line class="map-road" x1="0" y1="169" x2="340" y2="169" stroke-width="4"/>
+              <line class="map-road" x1="102" y1="0" x2="102" y2="260" stroke-width="3"/>
+              <line class="map-road" x1="238" y1="0" x2="238" y2="260" stroke-width="3"/>
+              <line class="map-road-sec" x1="0" y1="52" x2="340" y2="52" stroke-width="1.5"/>
+              <line class="map-road-sec" x1="0" y1="130" x2="340" y2="130" stroke-width="1.5"/>
+              <line class="map-road-sec" x1="0" y1="208" x2="340" y2="208" stroke-width="1.5"/>
+              <line class="map-road-sec" x1="51" y1="0" x2="51" y2="260" stroke-width="1.5"/>
+              <line class="map-road-sec" x1="153" y1="0" x2="153" y2="260" stroke-width="1.5"/>
+              <line class="map-road-sec" x1="289" y1="0" x2="289" y2="260" stroke-width="1.5"/>
+            </svg>
+            <!-- Buildings -->
+            <div class="map-bld" style="top:40%;left:8%;width:13%;height:18%"></div>
+            <div class="map-bld" style="top:13%;left:33%;width:11%;height:14%"></div>
+            <div class="map-bld" style="top:68%;left:72%;width:16%;height:17%"></div>
+            <div class="map-bld" style="top:18%;right:8%;width:9%;height:22%"></div>
+            <div class="map-bld" style="top:53%;left:4%;width:7%;height:11%"></div>
+            <div class="map-bld" style="top:6%;left:72%;width:12%;height:9%"></div>
+            <!-- Pin -->
+            <svg class="map-pin" width="30" height="30" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#4ade80"/>
+              <circle cx="12" cy="9" r="2.5" fill="#09090B"/>
+            </svg>
+            <!-- Fade -->
+            <div class="map-fade"></div>
+            <!-- Grid pattern collapsed -->
+            <div class="map-grid-pat">
+              <svg width="100%" height="100%"><defs><pattern id="mgrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0L0 0 0 20" fill="none" stroke="white" stroke-width=".5"/></pattern></defs><rect width="100%" height="100%" fill="url(#mgrid)"/></svg>
+            </div>
+            <!-- Content -->
+            <div class="map-content">
+              <div class="map-topbar">
+                <div class="map-icon-w">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+                    <line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/>
+                  </svg>
+                </div>
+                <div class="map-live"><div class="map-live-dot"></div><span>Live</span></div>
+              </div>
+              <div class="map-bottom">
+                <h4>Corso Re Umberto, 1 — Torino</h4>
+                <p class="map-coords">45.0665° N, 7.6836° E</p>
+                <div class="map-underline"></div>
+              </div>
+            </div>
+          </div>
+          <p class="map-hint">Clicca per espandere</p>
+        </div>
       </div>
       <div class="chat-win fu" id="chatWin">
         <div class="chat-top">
@@ -569,6 +682,30 @@ const chatObs=new IntersectionObserver(entries=>{
 },{threshold:.4});
 chatObs.observe(chatWin);
 function runChat(){let d=400;msgs.forEach((m,i)=>{setTimeout(()=>{if(i>0){const t=document.createElement('div');t.className='typing';t.innerHTML='<span></span><span></span><span></span>';chatMsgs.appendChild(t);chatMsgs.scrollTop=9999;setTimeout(()=>{chatMsgs.removeChild(t);addMsg(m);},550);}else addMsg(m);},d);d+=m.t==='bot'?1700:1200;});}
+// Map widget
+(function(){
+  const w=document.getElementById('mapW'),inner=document.getElementById('mapI');
+  if(!w||!inner)return;
+  let expanded=false;
+  // 3D tilt
+  w.addEventListener('mousemove',e=>{
+    const r=inner.getBoundingClientRect();
+    const cx=r.left+r.width/2,cy=r.top+r.height/2;
+    const dx=(e.clientX-cx)/50,dy=(e.clientY-cy)/50;
+    inner.style.setProperty('--rx',(-dy*6)+'deg');
+    inner.style.setProperty('--ry',(dx*6)+'deg');
+  });
+  w.addEventListener('mouseleave',()=>{
+    inner.style.setProperty('--rx','0deg');
+    inner.style.setProperty('--ry','0deg');
+  });
+  w.addEventListener('click',()=>{
+    expanded=!expanded;
+    inner.classList.toggle('expanded',expanded);
+  });
+  w.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){expanded=!expanded;inner.classList.toggle('expanded',expanded);}});
+})();
+
 function addMsg(m){const d=document.createElement('div');d.className='msg msg-'+m.t;d.textContent=m.s;d.style.cssText='opacity:0;transform:translateY(6px);transition:opacity .25s,transform .25s';chatMsgs.appendChild(d);chatMsgs.scrollTop=9999;requestAnimationFrame(()=>{d.style.opacity='1';d.style.transform='none';});}
 </script>
 </body>
