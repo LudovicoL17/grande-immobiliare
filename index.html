@@ -48,7 +48,7 @@ nav{position:fixed;top:1.2rem;left:50%;transform:translateX(-50%);z-index:100;
 .hero{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;
   padding:2rem;padding-top:80px;overflow:hidden}
 .hero-photo{position:absolute;inset:0;border-radius:0;
-  background:url('https://images.unsplash.com/photo-1560449752-3fd24d87f47a?w=1800&q=90&auto=format&fit=crop') center/cover no-repeat}
+  background:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1800&q=90&auto=format&fit=crop') center/cover no-repeat}
 .hero-overlay{position:absolute;inset:0;
   background:linear-gradient(to bottom,rgba(9,9,11,.25) 0%,rgba(9,9,11,.5) 50%,rgba(9,9,11,.92) 100%)}
 /* Giant watermark */
@@ -526,36 +526,16 @@ footer{background:var(--bg2);padding:3rem 2rem 1.5rem;border-top:1px solid var(-
         <!-- Interactive map widget -->
         <div class="map-widget" id="mapW" role="button" aria-label="Espandi mappa sede">
           <div class="map-inner" id="mapI">
-            <!-- BG map layer -->
-            <div class="map-bg"></div>
-            <!-- SVG streets -->
-            <svg class="map-svg" viewBox="0 0 340 260" preserveAspectRatio="none" aria-hidden="true">
-              <line class="map-road" x1="0" y1="91" x2="340" y2="91" stroke-width="4"/>
-              <line class="map-road" x1="0" y1="169" x2="340" y2="169" stroke-width="4"/>
-              <line class="map-road" x1="102" y1="0" x2="102" y2="260" stroke-width="3"/>
-              <line class="map-road" x1="238" y1="0" x2="238" y2="260" stroke-width="3"/>
-              <line class="map-road-sec" x1="0" y1="52" x2="340" y2="52" stroke-width="1.5"/>
-              <line class="map-road-sec" x1="0" y1="130" x2="340" y2="130" stroke-width="1.5"/>
-              <line class="map-road-sec" x1="0" y1="208" x2="340" y2="208" stroke-width="1.5"/>
-              <line class="map-road-sec" x1="51" y1="0" x2="51" y2="260" stroke-width="1.5"/>
-              <line class="map-road-sec" x1="153" y1="0" x2="153" y2="260" stroke-width="1.5"/>
-              <line class="map-road-sec" x1="289" y1="0" x2="289" y2="260" stroke-width="1.5"/>
-            </svg>
-            <!-- Buildings -->
-            <div class="map-bld" style="top:40%;left:8%;width:13%;height:18%"></div>
-            <div class="map-bld" style="top:13%;left:33%;width:11%;height:14%"></div>
-            <div class="map-bld" style="top:68%;left:72%;width:16%;height:17%"></div>
-            <div class="map-bld" style="top:18%;right:8%;width:9%;height:22%"></div>
-            <div class="map-bld" style="top:53%;left:4%;width:7%;height:11%"></div>
-            <div class="map-bld" style="top:6%;left:72%;width:12%;height:9%"></div>
-            <!-- Pin -->
-            <svg class="map-pin" width="30" height="30" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#4ade80"/>
-              <circle cx="12" cy="9" r="2.5" fill="#09090B"/>
-            </svg>
-            <!-- Fade -->
+            <!-- Real map iframe (lazy-loaded on expand) -->
+            <iframe id="mapIframe"
+              src="about:blank"
+              data-src="https://maps.google.com/maps?q=45.0665,7.6836&z=16&output=embed&hl=it"
+              style="position:absolute;inset:0;width:100%;height:100%;border:none;filter:invert(90%) hue-rotate(180deg) saturate(0.8);opacity:0;transition:opacity .4s .1s"
+              allowfullscreen loading="lazy" title="Mappa sede Grande Immobiliare">
+            </iframe>
+            <!-- Fade overlay bottom -->
             <div class="map-fade"></div>
-            <!-- Grid pattern collapsed -->
+            <!-- Grid pattern (collapsed only) -->
             <div class="map-grid-pat">
               <svg width="100%" height="100%"><defs><pattern id="mgrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0L0 0 0 20" fill="none" stroke="white" stroke-width=".5"/></pattern></defs><rect width="100%" height="100%" fill="url(#mgrid)"/></svg>
             </div>
@@ -685,15 +665,16 @@ function runChat(){let d=400;msgs.forEach((m,i)=>{setTimeout(()=>{if(i>0){const 
 // Map widget
 (function(){
   const w=document.getElementById('mapW'),inner=document.getElementById('mapI');
+  const iframe=document.getElementById('mapIframe');
   if(!w||!inner)return;
-  let expanded=false;
+  let expanded=false,mapLoaded=false;
   // 3D tilt
   w.addEventListener('mousemove',e=>{
     const r=inner.getBoundingClientRect();
     const cx=r.left+r.width/2,cy=r.top+r.height/2;
     const dx=(e.clientX-cx)/50,dy=(e.clientY-cy)/50;
-    inner.style.setProperty('--rx',(-dy*6)+'deg');
-    inner.style.setProperty('--ry',(dx*6)+'deg');
+    inner.style.setProperty('--rx',(-dy*4)+'deg');
+    inner.style.setProperty('--ry',(dx*4)+'deg');
   });
   w.addEventListener('mouseleave',()=>{
     inner.style.setProperty('--rx','0deg');
@@ -702,6 +683,12 @@ function runChat(){let d=400;msgs.forEach((m,i)=>{setTimeout(()=>{if(i>0){const 
   w.addEventListener('click',()=>{
     expanded=!expanded;
     inner.classList.toggle('expanded',expanded);
+    // Lazy-load real map on first expand
+    if(expanded&&!mapLoaded&&iframe){
+      mapLoaded=true;
+      iframe.src=iframe.dataset.src;
+      iframe.addEventListener('load',()=>{iframe.style.opacity='1';},{ once:true });
+    }
   });
   w.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){expanded=!expanded;inner.classList.toggle('expanded',expanded);}});
 })();
